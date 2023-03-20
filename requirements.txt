@@ -1,4 +1,0 @@
-Flask
-gunicorn
-spleeter
-google-cloud-storage
