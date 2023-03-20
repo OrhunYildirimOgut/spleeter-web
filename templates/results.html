@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Separation Results</title>
+    <style>
+        body {
+            background-color: lightblue;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .audio-container {
+            display: inline-block;
+            background-color: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Audio Separation Results</h1>
+
+    <!-- Display the original audio and separated audio tracks here -->
+    <div class="audio-container">
+        <h2>Original</h2>
+        <audio controls>
+            <source src="{{ separated_audio_urls['original'] }}" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <br>
+        <a href="{{ separated_audio_urls['original'] }}" download="original.mp3">Download</a>
+    </div>
+
+    {% for label, url in separated_audio_urls.items() %}
+        {% if label != 'original' %}
+            <div class="audio-container">
+                <h2>{{ label.capitalize() }}</h2>
+                <audio controls>
+                    <source src="{{ url }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                <br>
+                <a href="{{ url }}" download="{{ label }}.mp3">Download</a>
+            </div>
+        {% endif %}
+    {% endfor %}
+</body>
+</html>

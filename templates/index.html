@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Separation</title>
+    <style>
+        body {
+            background-color: lightblue;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        form {
+            display: inline-block;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <script>
+        function showLoadingMessage() {
+            document.getElementById('loading-message').style.display = 'block';
+        }
+    </script>
+</head>
+<body>
+    <h1>Audio Separation</h1>
+    <form id="conversion-form" action="/convert" method="post" onsubmit="showLoadingMessage();">
+        <label for="url">YouTube URL:</label>
+        <input type="text" id="url" name="url" required>
+        <br><br>
+        <label for="separation_option">Separation Option:</label>
+        <select name="separation_option" id="separation_option" required>
+            <option value="vocal_music">Vocal and Music</option>
+            <option value="vocal_music_bass_drum">Vocal, Music, Bass, and Drum</option>
+            <option value="vocal_music_bass_drum_piano">Vocal, Music, Bass, Drum, and Piano</option>
+        </select>
+        <br><br>
+        <button type="submit">Convert</button>
+    </form>
+    <div id="loading-message" style="display: none;">
+        <h2>Please wait, processing your audio...</h2>
+    </div>
+</body>
+</html>
