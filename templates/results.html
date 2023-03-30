@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <form action="{{ url_for('back') }}" method="POST">
+        <input type="submit" value="Back">
+    </form>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Separation Results</title>
     <style>
         body {
+            
             background-color: lightblue;
             font-family: Arial, sans-serif;
             text-align: center;
@@ -21,31 +26,71 @@
     </style>
 </head>
 <body>
+    <script>
+        // Get the video ID from the input URL
+        function getVideoId(url) {
+            const regex = /(?:v=|\/)([0-9A-Za-z_-]{11})/;
+            const match = regex.exec(url);
+            return match ? match[1] : null;
+        }
+    
+        // The YouTube IFrame API will call this function when the API is ready
+        function onYouTubeIframeAPIReady() {
+            const videoId = getVideoId("{{ url }}"); // Replace with the actual video URL
+            if (!videoId) {
+                console.error("Invalid YouTube video URL");
+                return;
+            }
+    
+            const player = new YT.Player("player", {
+                height: "360",
+                width: "640",
+                videoId: videoId,
+                events: {
+                    "onReady": onPlayerReady
+                }
+            });
+    
+            // Synchronize the video playback with the audio playback
+            function onPlayerReady(event) {
+                const audioElements = document.getElementsByTagName("audio");
+    
+                for (let i = 0; i < audioElements.length; i++) {
+                    const audio = audioElements[i];
+    
+                    // When the audio starts playing, play the YouTube video as well
+                    audio.addEventListener("play", () => {
+                        player.seekTo(audio.currentTime);
+                        player.playVideo();
+                    });
+    
+                    // When the audio is paused, pause the YouTube video as well
+                    audio.addEventListener("pause", () => {
+                        player.pauseVideo();
+                    });
+    
+                    // When the audio playback position is changed, update the YouTube video playback position
+                    audio.addEventListener("timeupdate", () => {
+                        const timeDifference = Math.abs(player.getCurrentTime() - audio.currentTime);
+                        if (timeDifference > 1) {
+                            player.seekTo(audio.currentTime);
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+    <div id="player"></div>
     <h1>Audio Separation Results</h1>
-
-    <!-- Display the original audio and separated audio tracks here -->
+{% for label, file_path in all_files.items() %}
     <div class="audio-container">
-        <h2>Original</h2>
+        <h2>{{ label.capitalize() }}</h2>
         <audio controls>
-            <source src="{{ separated_audio_urls['original'] }}" type="audio/mpeg">
+            <source src="{{ file_path }}" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
         <br>
-        <a href="{{ separated_audio_urls['original'] }}" download="original.mp3">Download</a>
     </div>
-
-    {% for label, url in separated_audio_urls.items() %}
-        {% if label != 'original' %}
-            <div class="audio-container">
-                <h2>{{ label.capitalize() }}</h2>
-                <audio controls>
-                    <source src="{{ url }}" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-                <br>
-                <a href="{{ url }}" download="{{ label }}.mp3">Download</a>
-            </div>
-        {% endif %}
-    {% endfor %}
+{% endfor %}
 </body>
 </html>
